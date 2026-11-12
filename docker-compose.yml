@@ -1,0 +1,32 @@
+services:
+  prefect:
+    build: .
+    command: prefect server start --host 0.0.0.0
+    ports:
+      - "127.0.0.1:4200:4200"
+    environment:
+      PREFECT_HOME: /state/prefect
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+    volumes:
+      - prefect-state:/state/prefect
+  mlflow:
+    build: .
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////state/mlflow.db --artifacts-destination /state/artifacts --allowed-hosts localhost:*,127.0.0.1:*,mlflow:5000
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - mlflow-state:/state
+  runner:
+    build: .
+    profiles: ["runner"]
+    environment:
+      PREFECT_API_URL: http://prefect:4200/api
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - prefect
+      - mlflow
+volumes:
+  prefect-state:
+  mlflow-state:

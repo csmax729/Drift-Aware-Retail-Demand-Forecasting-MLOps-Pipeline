@@ -1,0 +1,12 @@
+.venv/
+.deps/
+.testdeps/
+.modeldeps/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+data/
+mlruns/
+*.db
+.env
